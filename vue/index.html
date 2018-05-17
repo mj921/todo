@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <style>
+        body,div,dl,dt,input{
+            margin: 0;
+            padding: 0;
+        }
+        #app{
+            margin: 100px auto 0;
+            width: 550px;
+            box-shadow: 0 0 3px 0 rgba(0,0,0,0.3)
+        }
+        .select-all{
+            position: absolute;
+            left: 14px;
+            top: 26.5px;
+            width: 0;
+            height: 0;
+            border: 16px solid transparent;
+            border-bottom: 0;
+            border-top-color: #B1AEAE;
+        }
+        .select-all:after{
+            content: "";
+            display: block;
+            position: absolute;
+            left: -12px;
+            top: -16px;
+            width: 0;
+            height: 0;
+            border: 12px solid transparent;
+            border-bottom: 0;
+            border-top-color: #fff;
+        }
+        .ipt{
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 16px 16px 16px 60px;
+            height: 65px;
+        }
+        .ipt input{
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            font-size: 24px;
+            font-weight: normal;
+        }
+        .ipt input::-webkit-input-placeholder{ /*WebKit browsers*/
+            font-style:italic;
+        }
+        .ipt input::-moz-input-placeholder{ /*Mozilla Firefox*/
+            font-style:italic;
+        }
+        .ipt input::-ms-input-placeholder{ /*Internet Explorer*/ 
+            font-style:italic;
+        }
+        .list{
+            box-shadow: 0 0 3px 0 rgba(0,0,0,0.3)
+        }
+        .list dl{
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 16px 16px 16px 60px;
+            height: 65px;
+            font-size: 24px;
+            line-height: 34px;
+            border-bottom: 1px solid #D1D0D0;
+        }
+        .checkbox{
+            position: absolute;
+            left: 15px;
+            top: 17.5px;
+            width: 30px;
+            height: 30px;
+            border: 1px solid #D1D0D0;
+            border-radius: 50%;
+        }
+        .checkbox.checked:before{
+            content: "";
+            display: block;
+            position: absolute;
+            top: 18px;
+            left: 3px;
+            transform: rotate(45deg);
+            width: 10px;
+            height: 1px;
+            background-color: #1AE77D;
+        }
+        .checkbox.checked:after{
+            content: "";
+            display: block;
+            position: absolute;
+            top: 16px;
+            left: 10px;
+            transform: rotate(-45deg);
+            width: 18px;
+            height: 1px;
+            background-color: #1AE77D;
+        }
+        .bottom{
+            position: relative;
+            padding: 5px 20px;
+            text-align: center;
+            height: 30px;
+            line-height: 30px;
+            font-size: 14px;
+        }
+        .fl{
+            float: left;
+        }
+        .btns{
+            display: inline-block;
+        }
+        .btn{
+            float: left;
+            margin: 0 3px;
+            padding: 3px 7px;
+            height: 30px;
+            line-height: 24px;
+            cursor: default;
+            box-sizing: border-box;
+            border-radius: 3px;
+        }
+        .curr{
+            border: 1px solid #F67335;
+        }
+        .fr{
+            float: right;
+            cursor: default;
+        }
+        .bottom:before{
+            content: "";
+            position: absolute;
+            width: 540px;
+            height: 5px;
+            top: 40px;
+            left: 5px;
+            border: 1px solid #D1D0D0;
+            border-top: 0;
+        }
+        .bottom:after{
+            content: "";
+            position: absolute;
+            width: 530px;
+            height: 5px;
+            top: 45px;
+            left: 10px;
+            border: 1px solid #D1D0D0;
+            border-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="ipt">
+            <div class="select-all" @click="selectAll"></div>
+            <input type="text" v-model="ipt" @keydown.enter="save" placeholder="What needs to be done?">
+        </div>
+        <div class="list" v-if="list.length > 0">
+            <dl v-for="(item, i) in list" v-show="status === 0 || status === item.checked">
+                <div :class="['checkbox',{'checked':item.checked === 2}]" @click="checkboxClick(i)"></div>
+                <div class="list-text">{{item.text}}</div>
+            </dl>
+            <div class="bottom">
+                <div class="fl">{{items}} item left</div>
+                <div class="btns">
+                    <div :class="['btn', {'curr':status === 0}]" @click="changeStatus(0)">All</div>
+                    <div :class="['btn', {'curr':status === 1}]" @click="changeStatus(1)">Active</div>
+                    <div :class="['btn', {'curr':status === 2}]" @click="changeStatus(2)">Complete</div>
+                </div>
+                <div class="fr" @click="clear">Clear items</div>
+                <i></i>
+            </div>
+        </div>
+    </div>
+    <script src="vue.js"></script>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                ipt: "",
+                list: [],
+                status: 0
+            },
+            methods: {
+                save: function(){
+                    if (this.ipt !== "") {
+                        this.list.push({checked: 1, text: this.ipt});
+                        this.ipt = "";
+                    }
+                },
+                checkboxClick: function(i){
+                    this.list[i].checked = 3 - this.list[i].checked;
+                },
+                changeStatus:function(status){
+                    this.status = status;
+                },
+                clear:function(){
+                    for(var i = 0;i < this.list.length;){
+                        if (this.list[i].checked === 2) {
+                            this.list.splice(i,1);
+                        } else {
+                            i++;
+                        }
+                    }
+                },
+                selectAll:function(){
+                    for(var i = 0;i < this.list.length;i++){
+                        this.list[i].checked = 2;
+                    }
+                }
+            },
+            computed: {
+                items: function(){
+                    var n = 0;
+                    for(var i = 0;i < this.list.length;i++){
+                        if (this.list[i].checked === 1) {
+                            n++;
+                        }
+                    }
+                    return n;
+                }
+            }
+        });
+    </script>    
+</body>
+</html>
